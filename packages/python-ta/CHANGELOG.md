@@ -9,6 +9,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### ✨ Enhancements
 
+- Added a `--fix` command-line option (and `fix` argument to `check_all`/`check_errors`) that automatically fixes style warnings in place using autopep8 and Black, and a `--diff` option (`diff` argument) that previews these fixes without modifying files.
 - Contract checking now reports a class attribute that is annotated but never assigned as a contract violation, raising an `AssertionError` with a descriptive message instead of an `AttributeError`.
 - Added the ability to pin errors in the HTML report.
 - Added an `--autoformat` CLI option to format files with Black before analysis.

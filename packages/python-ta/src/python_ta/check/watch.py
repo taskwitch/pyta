@@ -31,6 +31,7 @@ class FileChangeHandler(FileSystemEventHandler):
         local_config: Union[dict[str, Any], str],
         load_default_config: bool,
         autoformat: Optional[bool],
+        fix: bool,
         level: str,
         f_paths: list[str],
     ) -> None:
@@ -39,6 +40,7 @@ class FileChangeHandler(FileSystemEventHandler):
         self.local_config = local_config
         self.load_default_config = load_default_config
         self.autoformat = autoformat
+        self.fix = fix
         self.level = level
         self.f_paths = f_paths
 
@@ -58,6 +60,7 @@ class FileChangeHandler(FileSystemEventHandler):
             local_config=self.local_config,
             load_default_config=self.load_default_config,
             autoformat=self.autoformat,
+            fix=self.fix,
             is_any_file_checked=True,
             current_reporter=current_reporter,
             f_paths=[],
@@ -74,6 +77,7 @@ def watch_files(
     local_config: Union[dict[str, Any], str],
     load_default_config: bool,
     autoformat: Optional[bool],
+    fix: bool,
     linter: PyLinter,
     f_paths: list[str],
 ) -> None:
@@ -85,6 +89,7 @@ def watch_files(
         local_config=local_config,
         load_default_config=load_default_config,
         autoformat=autoformat,
+        fix=fix,
         level=level,
         f_paths=f_paths,
     )

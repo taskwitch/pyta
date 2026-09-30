@@ -31,6 +31,7 @@ from ..patches import patch_all
 from ..reporters.core import PythonTaReporter
 from ..upload import upload_to_server
 from ..util.autoformat import run_autoformat
+from ..util.autofix import diff_autofix, run_autofix
 from ..util.extended_markup import ExtendedMarkup
 
 # Flag to determine if we've previously patched pylint
@@ -77,6 +78,8 @@ def check_file(
     current_reporter: PythonTaReporter,
     f_paths: list[str],
     pylint_args: Optional[list[str]] = None,
+    fix: bool = False,
+    diff: bool = False,
 ) -> tuple[bool, PyLinter]:
     """Perform linting on a single Python file using the provided linter and configuration"""
     # Load config file in user location. Construct new linter each
@@ -91,6 +94,18 @@ def check_file(
 
     if autoformat:
         run_autoformat(file_py, linter.config.autoformat_options, linter.config.max_line_length)
+
+    if fix or diff:
+        fix_args = (
+            file_py,
+            linter.config.autoformat_options,
+            linter.config.max_line_length,
+            linter.config.pycodestyle_ignore,
+        )
+        if diff:
+            print(diff_autofix(*fix_args), end="")
+        else:
+            run_autofix(*fix_args)
 
     if not is_any_file_checked:
         prev_output = current_reporter.out

@@ -272,6 +272,22 @@ def test_autoformat_passes_true_to_check_errors(monkeypatch) -> None:
     assert calls[0]["autoformat"] is True
 
 
+def test_fix_and_diff_flags_are_forwarded(monkeypatch) -> None:
+    """Test that --fix and --diff are passed through to the checker."""
+    calls = []
+    monkeypatch.setattr(pyta_main, "check_all", mock_checker(calls))
+
+    runner = CliRunner()
+    result = runner.invoke(
+        pyta_main.main,
+        ["--fix", "--diff", path.join(TEST_ROOT, "fixtures", "no_errors.py")],
+    )
+
+    assert result.exit_code == 0
+    assert calls[0]["fix"] is True
+    assert calls[0]["diff"] is True
+
+
 def test_stdin_flag_reads_from_stdin(monkeypatch) -> None:
     """Test that --stdin reads source code from stdin and passes it to the checker."""
     calls = []

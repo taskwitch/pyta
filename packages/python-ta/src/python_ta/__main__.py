@@ -55,6 +55,18 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
     help="Autoformat files using Black before analyzing code",
     default=False,
 )
+@click.option(
+    "--fix",
+    is_flag=True,
+    help="Automatically fix style issues in place (using autopep8 and Black) before analyzing code",
+    default=False,
+)
+@click.option(
+    "--diff",
+    is_flag=True,
+    help="Print the fixes that --fix would make without modifying any files",
+    default=False,
+)
 def main(
     version: bool,
     config: Optional[str],
@@ -65,6 +77,8 @@ def main(
     output_format: Optional[str],
     stdin: bool,
     autoformat: bool,
+    fix: bool,
+    diff: bool,
 ) -> None:
     """A code checking tool for teaching Python.
     FILENAMES can be a string of a directory, or file to check (`.py` extension optional) or
@@ -102,6 +116,8 @@ def main(
                 config=config,
                 output_format=output_format,
                 autoformat=autoformat,
+                fix=fix,
+                diff=diff,
             )
         # Clean up the temporary file
         os.unlink(temp_file.name)
@@ -114,6 +130,8 @@ def main(
             config=config,
             output_format=output_format,
             autoformat=autoformat,
+            fix=fix,
+            diff=diff,
         )
 
     if not exit_zero and reporter.has_messages():
@@ -128,8 +146,15 @@ def _invoke_checker(
     config: dict[str, Any] | str | None,
     output_format: Optional[str],
     autoformat: bool,
+    fix: bool = False,
+    diff: bool = False,
 ) -> PythonTaReporter:
     """Invoke the checker with the appropriate arguments based on the provided config and output_format."""
+    extra: dict[str, Any] = {}
+    if fix:
+        extra["fix"] = True
+    if diff:
+        extra["diff"] = True
     if output_format and config:
         # If both specified, use the config file and override the output format
         return checker(
@@ -137,17 +162,19 @@ def _invoke_checker(
             config=config,
             autoformat=autoformat,
             pylint_args=["--output-format", output_format],
+            **extra,
         )
     elif output_format:
         return checker(
             module_name=paths,
             config={"output-format": output_format},
             autoformat=autoformat,
+            **extra,
         )
     elif config:
-        return checker(module_name=paths, config=config, autoformat=autoformat)
+        return checker(module_name=paths, config=config, autoformat=autoformat, **extra)
     else:
-        return checker(module_name=paths, autoformat=autoformat)
+        return checker(module_name=paths, autoformat=autoformat, **extra)
 
 
 if __name__ == "__main__":  # pragma: no cover

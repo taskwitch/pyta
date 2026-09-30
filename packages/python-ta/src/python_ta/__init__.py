@@ -58,6 +58,8 @@ def check_errors(
     autoformat: Optional[bool] = False,
     on_verify_fail: Literal["log", "raise"] = "log",
     pylint_args: Optional[list[str]] = None,
+    fix: bool = False,
+    diff: bool = False,
 ) -> PythonTaReporter:
     """Check a module for errors, printing a report."""
     return _check(
@@ -69,6 +71,8 @@ def check_errors(
         autoformat=autoformat,
         on_verify_fail=on_verify_fail,
         pylint_args=pylint_args,
+        fix=fix,
+        diff=diff,
     )
 
 
@@ -80,6 +84,8 @@ def check_all(
     autoformat: Optional[bool] = False,
     on_verify_fail: Literal["log", "raise"] = "log",
     pylint_args: Optional[list[str]] = None,
+    fix: bool = False,
+    diff: bool = False,
 ) -> PythonTaReporter:
     """Analyse one or more Python modules for code issues and display the results.
 
@@ -111,6 +117,12 @@ def check_all(
             execution.
         pylint_args:
             A list of command-line arguments to pass to pylint.
+        fix:
+            If True, automatically fix style issues (e.g. pycodestyle warnings) in place
+            using autopep8 and Black before analyzing code.
+        diff:
+            If True, print a diff of the fixes that ``fix`` would apply, without modifying
+            any files.
 
     Returns:
         The ``PythonTaReporter`` object that generated the report.
@@ -124,6 +136,8 @@ def check_all(
         autoformat=autoformat,
         on_verify_fail=on_verify_fail,
         pylint_args=pylint_args,
+        fix=fix,
+        diff=diff,
     )
 
 
@@ -136,6 +150,8 @@ def _check(
     autoformat: Optional[bool] = False,
     on_verify_fail: Literal["log", "raise"] = "log",
     pylint_args: Optional[list[str]] = None,
+    fix: bool = False,
+    diff: bool = False,
 ) -> PythonTaReporter:
     """Check a module for problems, printing a report.
 
@@ -153,6 +169,8 @@ def _check(
     `on_verify_fail` determines how to handle files that cannot be checked. If set to "log" (default), an error
      message is logged and execution continues. If set to "raise", an error is raised immediately to stop execution.
     `pylint_args` is a list of command-line arguments to pass to pylint.
+    `fix` is used to specify whether style issues are automatically fixed in place.
+    `diff` is used to print the fixes that `fix` would apply without modifying files.
     """
     # Configuring logger
     logging.basicConfig(format="[%(levelname)s] %(message)s", level=logging.INFO)
@@ -188,6 +206,8 @@ def _check(
                     current_reporter=current_reporter,
                     f_paths=f_paths,
                     pylint_args=pylint_args,
+                    fix=fix,
+                    diff=diff,
                 )
                 current_reporter = linter.reporter  # type: ignore[assignment]
                 current_reporter.print_messages(level)
@@ -205,6 +225,7 @@ def _check(
                     local_config=local_config,
                     load_default_config=load_default_config,
                     autoformat=autoformat,
+                    fix=fix,
                     linter=linter,
                     f_paths=f_paths,
                 )

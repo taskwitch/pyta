@@ -85,6 +85,18 @@ This modifies the files in place:
 $ python_ta --autoformat sample.py
 ```
 
+To automatically fix style warnings (for example, missing blank lines or whitespace issues reported by
+pycodestyle) before analyzing a file, use the `--fix` option. This applies autopep8 and then Black,
+and modifies the files in place. Files with syntax errors are left unchanged.
+Use `--diff` to preview the changes without modifying any files:
+
+```console
+$ python_ta --diff sample.py
+$ python_ta --fix sample.py
+```
+
+From Python, pass `fix=True` or `diff=True` to `python_ta.check_all`.
+
 You can also pass Python code directly through standard input (stdin) instead of providing
 a file by using either the `--stdin` flag or `-` as the filename:
 
